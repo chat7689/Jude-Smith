@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Miles McMorin - Absolute Legend</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        h1 {
+            font-size: 3.5em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #667eea;
+            }
+            to {
+                text-shadow: 0 0 20px #fff, 0 0 30px #764ba2, 0 0 40px #764ba2;
+            }
+        }
+
+        .subtitle {
+            font-size: 1.5em;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .content {
+            font-size: 1.2em;
+            line-height: 1.8;
+            margin-bottom: 30px;
+        }
+
+        .highlight {
+            background: linear-gradient(120deg, #f6d365 0%, #fda085 100%);
+            padding: 2px 8px;
+            border-radius: 5px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .appreciate-btn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            padding: 20px 50px;
+            font-size: 1.5em;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 4px 15px rgba(245, 87, 108, 0.4);
+            font-weight: bold;
+        }
+
+        .appreciate-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 6px 20px rgba(245, 87, 108, 0.6);
+        }
+
+        .appreciate-btn:active {
+            transform: translateY(0) scale(0.95);
+        }
+
+        .counter {
+            font-size: 2em;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        .appreciation-message {
+            margin-top: 20px;
+            font-size: 1.3em;
+            opacity: 0;
+            transition: opacity 0.5s;
+            min-height: 40px;
+        }
+
+        .appreciation-message.show {
+            opacity: 1;
+        }
+
+        .facts {
+            margin-top: 30px;
+            text-align: left;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .facts h2 {
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .facts ul {
+            list-style: none;
+        }
+
+        .facts li {
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .facts li:last-child {
+            border-bottom: none;
+        }
+
+        .facts li:before {
+            content: "💪 ";
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Miles McMorin</h1>
+        <div class="subtitle">The Legendary Legend</div>
+
+        <div class="content">
+            <p>Let's be real: <span class="highlight">Miles McMorin</span> is absolutely incredible.</p>
+            <p>This guy is so strong, he probably bench presses mountains for fun.</p>
+            <p>He conquered <span class="highlight">Spencer Butte</span> like it was nothing - probably ran up it backwards while carrying his groceries.</p>
+        </div>
+
+        <div class="facts">
+            <h2>Undeniable Facts About Miles McMorin</h2>
+            <ul>
+                <li>Could probably lift a car with one hand while eating a sandwich with the other</li>
+                <li>Made Spencer Butte his personal stairmaster</li>
+                <li>Radiates big energy wherever he goes</li>
+                <li>The definition of strength, both physical and mental</li>
+                <li>Chuck Norris wishes he was Miles McMorin</li>
+                <li>Probably does push-ups to relax</li>
+            </ul>
+        </div>
+
+        <div style="margin-top: 40px;">
+            <button class="appreciate-btn" onclick="showAppreciation()">
+                Show Your Appreciation! 🙌
+            </button>
+        </div>
+
+        <div class="counter">
+            Appreciations: <span id="count">0</span>
+        </div>
+
+        <div class="appreciation-message" id="message"></div>
+    </div>
+
+    <script>
+        let count = 0;
+        const messages = [
+            "Yes! Miles McMorin is amazing! 💪",
+            "You get it! Miles is a true legend! 🌟",
+            "Exactly! Spencer Butte never stood a chance! 🏔️",
+            "Miles McMorin: Stronger than gravity! 🚀",
+            "The legend grows! Keep appreciating! 🎉",
+            "Miles approves of your good taste! 👍",
+            "That's the spirit! Miles is unmatched! ⚡",
+            "You're absolutely right! Miles is incredible! 🔥",
+            "Spencer Butte is just his warm-up! 💯",
+            "Miles McMorin: Making excellence look easy! ✨"
+        ];
+
+        function showAppreciation() {
+            count++;
+            document.getElementById('count').textContent = count;
+
+            const messageElement = document.getElementById('message');
+            const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+
+            messageElement.classList.remove('show');
+
+            setTimeout(() => {
+                messageElement.textContent = randomMessage;
+                messageElement.classList.add('show');
+            }, 100);
+
+            // Add a fun animation to the button
+            const btn = event.target;
+            btn.style.transform = 'scale(0.9)';
+            setTimeout(() => {
+                btn.style.transform = '';
+            }, 100);
+        }
+    </script>
+</body>
+</html>

@@ -3,295 +3,372 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Jude Smith | The Legend</title>
+<title>JUDE SMITH | ELITE STATUS</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
 <style>
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    scroll-behavior: smooth;
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+    font-family:Poppins, sans-serif;
+    background:#050510;
+    color:white;
+    overflow-x:hidden;
 }
 
-body {
-    font-family: 'Poppins', sans-serif;
-    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-    color: white;
-    overflow-x: hidden;
+/* PARTICLE CANVAS */
+#bgCanvas{
+    position:fixed;
+    top:0;
+    left:0;
+    z-index:-1;
 }
 
-/* NAVIGATION */
-nav {
-    position: fixed;
-    width: 100%;
-    background: rgba(0,0,0,0.7);
-    backdrop-filter: blur(10px);
-    padding: 15px 0;
-    z-index: 1000;
+/* NAV */
+nav{
+    position:fixed;
+    width:100%;
+    background:rgba(0,0,0,0.6);
+    backdrop-filter:blur(10px);
+    padding:15px;
+    text-align:center;
+    z-index:1000;
 }
 
-nav ul {
-    display: flex;
-    justify-content: center;
-    list-style: none;
+nav a{
+    margin:0 20px;
+    color:white;
+    text-decoration:none;
+    font-weight:600;
+    transition:0.3s;
+}
+nav a:hover{color:#00ffff}
+
+/* HERO */
+.hero{
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
 }
 
-nav ul li {
-    margin: 0 20px;
+.hero h1{
+    font-family:Orbitron;
+    font-size:4rem;
+    background:linear-gradient(to right,#00ffff,#ff00ff);
+    -webkit-background-clip:text;
+    color:transparent;
 }
 
-nav ul li a {
-    text-decoration: none;
-    color: white;
-    font-weight: 600;
-    transition: 0.3s;
+#respectCount{
+    font-size:3rem;
+    margin:20px 0;
+    font-weight:bold;
 }
 
-nav ul li a:hover {
-    color: #00ffff;
+#combo{
+    font-size:1.2rem;
+    color:#00ffcc;
 }
 
-/* HERO SECTION */
-.hero {
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    padding: 20px;
+.respect-btn{
+    padding:20px 40px;
+    font-size:1.5rem;
+    border:none;
+    border-radius:50px;
+    cursor:pointer;
+    background:#00ffff;
+    color:black;
+    font-weight:bold;
+    transition:0.2s;
+}
+.respect-btn:hover{transform:scale(1.1)}
+
+.shake{
+    animation:shake 0.2s;
+}
+@keyframes shake{
+    0%{transform:translateX(0)}
+    25%{transform:translateX(-5px)}
+    50%{transform:translateX(5px)}
+    75%{transform:translateX(-5px)}
+    100%{transform:translateX(0)}
 }
 
-.hero h1 {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 4rem;
-    background: linear-gradient(to right, #00ffff, #00ff88);
-    -webkit-background-clip: text;
-    color: transparent;
+/* FLOATING TEXT */
+.floating{
+    position:absolute;
+    font-weight:bold;
+    pointer-events:none;
+    animation:floatUp 1s ease-out forwards;
+}
+@keyframes floatUp{
+    0%{opacity:1;transform:translateY(0)}
+    100%{opacity:0;transform:translateY(-80px)}
 }
 
-.hero p {
-    font-size: 1.5rem;
-    margin-top: 20px;
-    opacity: 0.9;
+/* SECTIONS */
+.section{
+    padding:120px 10%;
+    text-align:center;
 }
 
-.glow-btn {
-    margin-top: 30px;
-    padding: 15px 30px;
-    border: none;
-    background: #00ffff;
-    color: black;
-    font-weight: bold;
-    font-size: 1rem;
-    border-radius: 30px;
-    cursor: pointer;
-    transition: 0.3s;
+.card{
+    background:rgba(255,255,255,0.05);
+    padding:30px;
+    margin:20px;
+    border-radius:15px;
+    display:inline-block;
+    width:250px;
+    transition:0.3s;
+}
+.card:hover{
+    background:rgba(255,255,255,0.15);
+    transform:translateY(-10px);
 }
 
-.glow-btn:hover {
-    background: #00ff88;
-    transform: scale(1.1);
+/* MINI GAME BOX */
+.gameBox{
+    margin-top:40px;
+    padding:40px;
+    background:rgba(255,255,255,0.05);
+    border-radius:20px;
 }
 
-/* SECTION STYLE */
-.section {
-    padding: 100px 10%;
-    text-align: center;
+/* DODGE GAME */
+#dodgeArea{
+    width:100%;
+    height:200px;
+    background:#111;
+    position:relative;
+    overflow:hidden;
+    margin-top:20px;
+}
+.enemy{
+    width:40px;
+    height:40px;
+    background:red;
+    position:absolute;
+    top:80px;
+}
+.player{
+    width:40px;
+    height:40px;
+    background:#00ffff;
+    position:absolute;
+    bottom:10px;
+    left:50%;
+    transform:translateX(-50%);
 }
 
-.section h2 {
-    font-size: 2.5rem;
-    margin-bottom: 40px;
-    font-family: 'Orbitron', sans-serif;
-}
-
-/* CARDS */
-.cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 30px;
-}
-
-.card {
-    background: rgba(255,255,255,0.1);
-    padding: 30px;
-    border-radius: 15px;
-    backdrop-filter: blur(10px);
-    transition: 0.3s;
-}
-
-.card:hover {
-    transform: translateY(-10px);
-    background: rgba(255,255,255,0.2);
-}
-
-/* FITNESS BAR */
-.bar-container {
-    margin: 20px 0;
-}
-
-.bar {
-    height: 20px;
-    background: #00ff88;
-    border-radius: 10px;
+/* AURA MODE */
+.aura{
+    box-shadow:0 0 40px #00ffff, 0 0 80px #ff00ff;
 }
 
 /* FOOTER */
-footer {
-    padding: 40px;
-    text-align: center;
-    background: rgba(0,0,0,0.7);
-}
-
-/* ANIMATION */
-.fade-in {
-    opacity: 0;
-    transform: translateY(40px);
-    transition: 1s;
-}
-
-.fade-in.visible {
-    opacity: 1;
-    transform: translateY(0);
+footer{
+    padding:40px;
+    text-align:center;
+    background:#000;
 }
 </style>
 </head>
 
 <body>
 
+<canvas id="bgCanvas"></canvas>
+
 <nav>
-<ul>
-<li><a href="#about">About</a></li>
-<li><a href="#fitness">Fitness</a></li>
-<li><a href="#gaming">Gaming</a></li>
-<li><a href="#stats">Stats</a></li>
-</ul>
+<a href="#respect">Respect</a>
+<a href="#stats">Stats</a>
+<a href="#training">Training</a>
+<a href="#reflex">Reflex Mode</a>
 </nav>
 
-<section class="hero">
-    <h1>JUDE SMITH</h1>
-    <p>Tall. Strong. Locked In. Built Different.</p>
-    <button class="glow-btn" onclick="respect()">+1000 Respect</button>
-    <p id="respectMessage" style="margin-top:20px;"></p>
+<section class="hero" id="respect">
+<h1>JUDE SMITH</h1>
+<div id="respectCount">Respect: 0</div>
+<div id="combo">Combo: x1</div>
+<button class="respect-btn" onclick="gainRespect(event)">+ RESPECT</button>
 </section>
 
-<section id="about" class="section fade-in">
-    <h2>About The Legend</h2>
-    <p>
-        Jude Smith stands tall — literally and figuratively. 
-        A presence you notice instantly. Calm confidence, focused energy, 
-        and always operating at peak levels.
-    </p>
-    <br>
-    <p>
-        Whether he's grinding in the gym or casually dominating 
-        Mike Tyson’s Punch-Out!! during advisory, Jude moves differently.
-    </p>
+<section class="section" id="stats">
+<h2>Elite Attributes</h2>
+<div class="card">Height: Top Tier Presence</div>
+<div class="card">Strength: Gym Locked</div>
+<div class="card">Discipline: 100%</div>
+<div class="card">Advisory Mode: Punch-Out Champion</div>
 </section>
 
-<section id="fitness" class="section fade-in">
-    <h2>Physical Stats</h2>
-
-    <div class="bar-container">
-        Strength
-        <div class="bar" style="width:95%"></div>
-    </div>
-
-    <div class="bar-container">
-        Endurance
-        <div class="bar" style="width:90%"></div>
-    </div>
-
-    <div class="bar-container">
-        Discipline
-        <div class="bar" style="width:100%"></div>
-    </div>
-
+<section class="section" id="training">
+<h2>Training Clicker Mode 💪</h2>
+<p>Spam clicks to build strength.</p>
+<div class="gameBox">
+<button class="respect-btn" onclick="train()">Lift</button>
+<div id="trainingPoints">Training Points: 0</div>
+</div>
 </section>
 
-<section id="gaming" class="section fade-in">
-    <h2>Arcade Mode Activated 🎮</h2>
-    <div class="cards">
-        <div class="card">
-            <h3>Mike Tyson's Punch-Out!!</h3>
-            <p>
-                During advisory, when others are distracted,
-                Jude locks in and throws pixel-perfect combinations.
-            </p>
-        </div>
-        <div class="card">
-            <h3>Reaction Speed</h3>
-            <p>
-                Dodges. Counters. Uppercuts. 
-                Timing is unmatched.
-            </p>
-        </div>
-        <div class="card">
-            <h3>Champion Mentality</h3>
-            <p>
-                Doesn't just play.
-                Studies patterns.
-                Executes flawlessly.
-            </p>
-        </div>
-    </div>
-</section>
-
-<section id="stats" class="section fade-in">
-    <h2>Legend Stats</h2>
-    <div class="cards">
-        <div class="card">
-            <h3>Height</h3>
-            <p>Elite Tier</p>
-        </div>
-        <div class="card">
-            <h3>Gym Consistency</h3>
-            <p>Unbreakable</p>
-        </div>
-        <div class="card">
-            <h3>Advisory Dominance</h3>
-            <p>99 Overall</p>
-        </div>
-        <div class="card">
-            <h3>Aura</h3>
-            <p>Infinite</p>
-        </div>
-    </div>
+<section class="section" id="reflex">
+<h2>Punch-Out Reflex Mode 🎮</h2>
+<p>Use arrow keys to dodge the red punch.</p>
+<div id="dodgeArea">
+<div class="player" id="player"></div>
+</div>
+<div id="score">Score: 0</div>
 </section>
 
 <footer>
-    Built with respect. Powered by greatness.
+Aura Status: <span id="auraStatus">Locked</span>
 </footer>
 
 <script>
-function respect() {
-    document.getElementById("respectMessage").innerText =
-    "Respect level increased. Jude's aura grows stronger.";
+/* RESPECT SYSTEM */
+let respect = localStorage.getItem("respect") ? parseInt(localStorage.getItem("respect")) : 0;
+let combo = 1;
+let lastClick = 0;
+
+const respectDisplay = document.getElementById("respectCount");
+const comboDisplay = document.getElementById("combo");
+respectDisplay.innerText = "Respect: " + respect;
+
+function gainRespect(e){
+    let now = Date.now();
+    if(now - lastClick < 500){
+        combo++;
+    } else {
+        combo = 1;
+    }
+    lastClick = now;
+
+    let gained = combo * 10;
+    respect += gained;
+
+    localStorage.setItem("respect", respect);
+    respectDisplay.innerText = "Respect: " + respect;
+    comboDisplay.innerText = "Combo: x" + combo;
+
+    floatText(e.clientX, e.clientY, "+" + gained);
+    playBeep();
+
+    if(combo >= 10){
+        document.body.classList.add("shake");
+        setTimeout(()=>document.body.classList.remove("shake"),200);
+    }
+
+    if(respect >= 1000){
+        document.body.classList.add("aura");
+        document.getElementById("auraStatus").innerText = "UNLOCKED";
+    }
 }
 
-const faders = document.querySelectorAll('.fade-in');
+function floatText(x,y,text){
+    let el = document.createElement("div");
+    el.className="floating";
+    el.style.left=x+"px";
+    el.style.top=y+"px";
+    el.innerText=text;
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(),1000);
+}
 
-const appearOptions = {
-    threshold: 0.3
-};
+/* SOUND */
+function playBeep(){
+    let ctx = new (window.AudioContext||window.webkitAudioContext)();
+    let osc = ctx.createOscillator();
+    osc.type="square";
+    osc.frequency.value=200;
+    osc.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime+0.05);
+}
 
-const appearOnScroll = new IntersectionObserver(function(entries, appearOnScroll){
-    entries.forEach(entry => {
-        if(!entry.isIntersecting){
-            return;
-        } else {
-            entry.target.classList.add('visible');
-            appearOnScroll.unobserve(entry.target);
-        }
-    });
-}, appearOptions);
+/* TRAINING MODE */
+let trainingPoints = 0;
+function train(){
+    trainingPoints++;
+    document.getElementById("trainingPoints").innerText =
+    "Training Points: " + trainingPoints;
+}
 
-faders.forEach(fader => {
-    appearOnScroll.observe(fader);
+/* DODGE GAME */
+const dodgeArea = document.getElementById("dodgeArea");
+const player = document.getElementById("player");
+let score = 0;
+
+document.addEventListener("keydown", e=>{
+    if(e.key==="ArrowLeft"){
+        player.style.left = (player.offsetLeft - 30)+"px";
+    }
+    if(e.key==="ArrowRight"){
+        player.style.left = (player.offsetLeft + 30)+"px";
+    }
 });
+
+function spawnEnemy(){
+    let enemy = document.createElement("div");
+    enemy.className="enemy";
+    enemy.style.left = Math.random()* (dodgeArea.offsetWidth-40) +"px";
+    dodgeArea.appendChild(enemy);
+
+    let move = setInterval(()=>{
+        enemy.style.top = enemy.offsetTop + 5 + "px";
+
+        if(enemy.offsetTop > 200){
+            enemy.remove();
+            score++;
+            document.getElementById("score").innerText="Score: "+score;
+            clearInterval(move);
+        }
+
+        if(collide(enemy,player)){
+            score=0;
+            document.getElementById("score").innerText="Score: 0";
+            enemy.remove();
+            clearInterval(move);
+        }
+    },30);
+}
+
+function collide(a,b){
+    return !(a.offsetTop > b.offsetTop + b.offsetHeight ||
+             a.offsetTop + a.offsetHeight < b.offsetTop ||
+             a.offsetLeft > b.offsetLeft + b.offsetWidth ||
+             a.offsetLeft + a.offsetWidth < b.offsetLeft);
+}
+
+setInterval(spawnEnemy,1500);
+
+/* PARTICLE BACKGROUND */
+const canvas = document.getElementById("bgCanvas");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let particles=[];
+for(let i=0;i<100;i++){
+    particles.push({
+        x:Math.random()*canvas.width,
+        y:Math.random()*canvas.height,
+        dx:(Math.random()-0.5),
+        dy:(Math.random()-0.5)
+    });
+}
+
+function animate(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle="#00ffff";
+    particles.forEach(p=>{
+        p.x+=p.dx;
+        p.y+=p.dy;
+        ctx.fillRect(p.x,p.y,2,2);
+    });
+    requestAnimationFrame(animate);
+}
+animate();
 </script>
 
 </body>

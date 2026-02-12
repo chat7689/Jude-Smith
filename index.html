@@ -1,111 +1,297 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Jude Smith Appreciation Page</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, Helvetica, sans-serif;
-            background: linear-gradient(135deg, #1e3c72, #2a5298);
-            color: white;
-            text-align: center;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jude Smith | The Legend</title>
 
-        header {
-            padding: 60px 20px;
-        }
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
-        h1 {
-            font-size: 3em;
-            margin-bottom: 10px;
-        }
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    scroll-behavior: smooth;
+}
 
-        .tagline {
-            font-size: 1.3em;
-            opacity: 0.9;
-        }
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    color: white;
+    overflow-x: hidden;
+}
 
-        .section {
-            background: rgba(255, 255, 255, 0.1);
-            margin: 30px auto;
-            padding: 30px;
-            border-radius: 15px;
-            width: 85%;
-            max-width: 800px;
-            backdrop-filter: blur(10px);
-        }
+/* NAVIGATION */
+nav {
+    position: fixed;
+    width: 100%;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(10px);
+    padding: 15px 0;
+    z-index: 1000;
+}
 
-        .highlight {
-            color: #ffd700;
-            font-weight: bold;
-        }
+nav ul {
+    display: flex;
+    justify-content: center;
+    list-style: none;
+}
 
-        footer {
-            margin-top: 40px;
-            padding: 20px;
-            font-size: 0.9em;
-            opacity: 0.8;
-        }
+nav ul li {
+    margin: 0 20px;
+}
 
-        button {
-            background-color: #ffd700;
-            border: none;
-            padding: 12px 20px;
-            font-size: 1em;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: 0.3s ease;
-        }
+nav ul li a {
+    text-decoration: none;
+    color: white;
+    font-weight: 600;
+    transition: 0.3s;
+}
 
-        button:hover {
-            background-color: white;
-            color: #2a5298;
-        }
-    </style>
+nav ul li a:hover {
+    color: #00ffff;
+}
+
+/* HERO SECTION */
+.hero {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+}
+
+.hero h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 4rem;
+    background: linear-gradient(to right, #00ffff, #00ff88);
+    -webkit-background-clip: text;
+    color: transparent;
+}
+
+.hero p {
+    font-size: 1.5rem;
+    margin-top: 20px;
+    opacity: 0.9;
+}
+
+.glow-btn {
+    margin-top: 30px;
+    padding: 15px 30px;
+    border: none;
+    background: #00ffff;
+    color: black;
+    font-weight: bold;
+    font-size: 1rem;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.glow-btn:hover {
+    background: #00ff88;
+    transform: scale(1.1);
+}
+
+/* SECTION STYLE */
+.section {
+    padding: 100px 10%;
+    text-align: center;
+}
+
+.section h2 {
+    font-size: 2.5rem;
+    margin-bottom: 40px;
+    font-family: 'Orbitron', sans-serif;
+}
+
+/* CARDS */
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+}
+
+.card {
+    background: rgba(255,255,255,0.1);
+    padding: 30px;
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+    transition: 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-10px);
+    background: rgba(255,255,255,0.2);
+}
+
+/* FITNESS BAR */
+.bar-container {
+    margin: 20px 0;
+}
+
+.bar {
+    height: 20px;
+    background: #00ff88;
+    border-radius: 10px;
+}
+
+/* FOOTER */
+footer {
+    padding: 40px;
+    text-align: center;
+    background: rgba(0,0,0,0.7);
+}
+
+/* ANIMATION */
+.fade-in {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: 1s;
+}
+
+.fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+</style>
 </head>
+
 <body>
 
-<header>
-    <h1>Jude Smith</h1>
-    <p class="tagline">An absolute legend 💫</p>
-</header>
+<nav>
+<ul>
+<li><a href="#about">About</a></li>
+<li><a href="#fitness">Fitness</a></li>
+<li><a href="#gaming">Gaming</a></li>
+<li><a href="#stats">Stats</a></li>
+</ul>
+</nav>
 
-<div class="section">
-    <h2>Why Jude is Elite</h2>
+<section class="hero">
+    <h1>JUDE SMITH</h1>
+    <p>Tall. Strong. Locked In. Built Different.</p>
+    <button class="glow-btn" onclick="respect()">+1000 Respect</button>
+    <p id="respectMessage" style="margin-top:20px;"></p>
+</section>
+
+<section id="about" class="section fade-in">
+    <h2>About The Legend</h2>
     <p>
-        Jude Smith is the definition of <span class="highlight">confidence, charisma, and excellence</span>.
-        Whether it's academics, athletics, creativity, or just being a great person —
-        Jude sets the standard.
+        Jude Smith stands tall — literally and figuratively. 
+        A presence you notice instantly. Calm confidence, focused energy, 
+        and always operating at peak levels.
     </p>
-</div>
+    <br>
+    <p>
+        Whether he's grinding in the gym or casually dominating 
+        Mike Tyson’s Punch-Out!! during advisory, Jude moves differently.
+    </p>
+</section>
 
-<div class="section">
-    <h2>Top Tier Qualities</h2>
-    <p>🔥 Unmatched work ethic</p>
-    <p>🔥 Natural leadership energy</p>
-    <p>🔥 Always leveling up</p>
-    <p>🔥 Certified legend status</p>
-</div>
+<section id="fitness" class="section fade-in">
+    <h2>Physical Stats</h2>
 
-<div class="section">
-    <h2>Respect Button</h2>
-    <p>Click below to pay your respects.</p>
-    <button onclick="showMessage()">Respect +100</button>
-    <p id="message"></p>
-</div>
+    <div class="bar-container">
+        Strength
+        <div class="bar" style="width:95%"></div>
+    </div>
+
+    <div class="bar-container">
+        Endurance
+        <div class="bar" style="width:90%"></div>
+    </div>
+
+    <div class="bar-container">
+        Discipline
+        <div class="bar" style="width:100%"></div>
+    </div>
+
+</section>
+
+<section id="gaming" class="section fade-in">
+    <h2>Arcade Mode Activated 🎮</h2>
+    <div class="cards">
+        <div class="card">
+            <h3>Mike Tyson's Punch-Out!!</h3>
+            <p>
+                During advisory, when others are distracted,
+                Jude locks in and throws pixel-perfect combinations.
+            </p>
+        </div>
+        <div class="card">
+            <h3>Reaction Speed</h3>
+            <p>
+                Dodges. Counters. Uppercuts. 
+                Timing is unmatched.
+            </p>
+        </div>
+        <div class="card">
+            <h3>Champion Mentality</h3>
+            <p>
+                Doesn't just play.
+                Studies patterns.
+                Executes flawlessly.
+            </p>
+        </div>
+    </div>
+</section>
+
+<section id="stats" class="section fade-in">
+    <h2>Legend Stats</h2>
+    <div class="cards">
+        <div class="card">
+            <h3>Height</h3>
+            <p>Elite Tier</p>
+        </div>
+        <div class="card">
+            <h3>Gym Consistency</h3>
+            <p>Unbreakable</p>
+        </div>
+        <div class="card">
+            <h3>Advisory Dominance</h3>
+            <p>99 Overall</p>
+        </div>
+        <div class="card">
+            <h3>Aura</h3>
+            <p>Infinite</p>
+        </div>
+    </div>
+</section>
 
 <footer>
-    <p>Made with respect and positivity ✨</p>
+    Built with respect. Powered by greatness.
 </footer>
 
 <script>
-    function showMessage() {
-        document.getElementById("message").innerText = 
-        "You just gained +100 respect for Jude Smith.";
-    }
+function respect() {
+    document.getElementById("respectMessage").innerText =
+    "Respect level increased. Jude's aura grows stronger.";
+}
+
+const faders = document.querySelectorAll('.fade-in');
+
+const appearOptions = {
+    threshold: 0.3
+};
+
+const appearOnScroll = new IntersectionObserver(function(entries, appearOnScroll){
+    entries.forEach(entry => {
+        if(!entry.isIntersecting){
+            return;
+        } else {
+            entry.target.classList.add('visible');
+            appearOnScroll.unobserve(entry.target);
+        }
+    });
+}, appearOptions);
+
+faders.forEach(fader => {
+    appearOnScroll.observe(fader);
+});
 </script>
 
 </body>

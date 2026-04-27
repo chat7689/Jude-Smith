@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GUS MACRHODES: SYNC EDITION</title>
     <style>
-        :root { --neon: #00e5ff; --accent: #ff0055; --bg: #000000; }
+        :root { --neon: #00e5ff; --accent: #ff0055; --bg: #000000; --gold: #ffcc00; }
         * { box-sizing: border-box; }
         body, html { margin: 0; padding: 0; width: 100vw; height: 100vh; overflow: hidden; background: var(--bg); font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: white; user-select: none; }
         canvas { display: block; position: absolute; top: 0; left: 0; z-index: 1; }
         
         #ui-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none; display: flex; flex-direction: column; justify-content: space-between; padding: 30px; }
         
-        .hud-top { display: flex; gap: 20px; }
+        .hud-top { display: flex; gap: 20px; flex-wrap: wrap; }
         .hud-box { background: rgba(10, 10, 15, 0.4); border-left: 4px solid var(--neon); padding: 12px 25px; text-transform: uppercase; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border-radius: 0 8px 8px 0; box-shadow: 0 4px 15px rgba(0,0,0,0.5); transition: border-color 0.3s ease; }
         .hud-lbl { font-size: 11px; color: #aaa; letter-spacing: 3px; margin-bottom: 5px; font-weight: bold; }
         .hud-val { font-size: 36px; font-weight: 900; text-shadow: 0 0 15px currentColor; letter-spacing: 2px; font-variant-numeric: tabular-nums; transition: color 0.3s ease; }
@@ -33,6 +33,10 @@
         <div class="hud-box" style="border-color: var(--neon);">
             <div class="hud-lbl">DISTANCE</div>
             <div id="dist-display" class="hud-val" style="color: var(--neon);">0M</div>
+        </div>
+        <div class="hud-box" style="border-color: var(--gold);">
+            <div class="hud-lbl">BEST</div>
+            <div id="high-display" class="hud-val" style="color: var(--gold);">0M</div>
         </div>
         <div class="hud-box" id="biome-box" style="border-color: #00e5ff;">
             <div class="hud-lbl">SECTOR</div>
@@ -58,17 +62,22 @@ const screenTitle = document.getElementById('screen-title');
 const screenSub = document.getElementById('screen-sub');
 const startBtn = document.getElementById('start-btn');
 const distDisplay = document.getElementById('dist-display');
+const highDisplay = document.getElementById('high-display');
 const biomeDisplay = document.getElementById('biome-display');
 const biomeBox = document.getElementById('biome-box');
+
+// Load High Score
+let highScore = localStorage.getItem('gus_highscore') || 0;
+highDisplay.innerText = highScore + "M";
 
 let W, H;
 let frame = 0;
 let state = 'START'; 
 
-// Six unique biomes
+// Updated Biomes (Sine Tunnel is now just TUNNEL)
 const BIOMES = [
     { name: "NEON GATES", color: '#00e5ff', type: 'gap' },
-    { name: "SINE TUNNEL", color: '#ff00aa', type: 'sine' },
+    { name: "TUNNEL", color: '#ff00aa', type: 'sine' },
     { name: "ORBITAL CLUSTER", color: '#00ff66', type: 'circle' },
     { name: "HEXAGON HIVE", color: '#ffff00', type: 'hex' },
     { name: "PULSE PILLARS", color: '#ff0000', type: 'pulse' },
@@ -133,7 +142,7 @@ const player = {
     },
     
     update() {
-        // Control multiplier matches speed scaling (base speed is 9)
+        // Control multiplier matches speed scaling so the flight angle is consistent
         const controlRatio = game.speed / 9; 
         
         const force = 0.85 * controlRatio; 
@@ -192,15 +201,14 @@ function spawnObstacles() {
             obstacles.push({ type: 'rect', x: x, y: gapY + (gapSize/2), w: 70, h: H }); 
         } 
         else if (biome.type === 'sine') {
-            // Gap center strictly follows a sine wave calculated by its X position
-            const sineY = H/2 + Math.sin(x * 0.003) * (H * 0.35);
+            // Tightened spacing and adjusted frequency for a perfect sine wave path
+            const sineY = H/2 + Math.sin(x * 0.005) * (H * 0.35);
             const gapSize = 330; 
             obstacles.push({ type: 'rect', x: x, y: 0, w: 70, h: sineY - (gapSize/2) }); 
             obstacles.push({ type: 'rect', x: x, y: sineY + (gapSize/2), w: 70, h: H }); 
-            spacing = 300; // Pack them tighter to form a visible wave tunnel
+            spacing = 150; // Pillars packed closely together to create the "tunnel" effect
         }
         else if (biome.type === 'pulse') {
-            // Dynamic pulsating rectangles
             obstacles.push({ type: 'pulse', x: x, gapY: gapY, gapSize: 350, phase: x * 0.01 }); 
         }
         else if (biome.type === 'circle') {
@@ -259,9 +267,7 @@ function updateAndDrawObstacles() {
                 player.y + player.size > o.y && player.y - player.size < o.y + o.h) { die(); }
         } 
         else if (o.type === 'pulse') {
-            // Gap dynamically shrinks and expands
             let currentGap = o.gapSize + Math.sin(frame * 0.06 + o.phase) * 160;
-            // Prevent gap from closing entirely to keep it strictly fair
             if (currentGap < 120) currentGap = 120; 
             
             let topH = o.gapY - (currentGap/2);
@@ -287,7 +293,6 @@ function updateAndDrawObstacles() {
                 ctx[j === 0 ? 'moveTo' : 'lineTo'](o.x + o.r * Math.cos(a), o.y + o.r * Math.sin(a));
             }
             ctx.closePath(); ctx.fill(); ctx.stroke();
-            // Approximating hex collision circle slightly smaller than visual radius
             if (Math.hypot(player.x - o.x, player.y - o.y) < o.r * 0.85 + player.size) die();
         }
         else if (o.type === 'tri') {
@@ -321,11 +326,19 @@ function die() {
     state = 'DEAD'; game.screenShake = 20;
     spawnParticles(player.x, player.y, '#ff0055', 150, 25, 'explode');
     
+    // Check and save Highscore
+    let finalScore = Math.floor(game.distance);
+    if (finalScore > highScore) {
+        highScore = finalScore;
+        localStorage.setItem('gus_highscore', highScore);
+        highDisplay.innerText = highScore + "M";
+    }
+
     setTimeout(() => {
         screens.style.display = 'flex'; 
         screenTitle.innerText = "HULL DESTROYED"; 
         screenTitle.style.color = "var(--accent)";
-        screenSub.innerText = `FINAL FLIGHT: ${Math.floor(game.distance)}M`; 
+        screenSub.innerText = `FINAL FLIGHT: ${finalScore}M (BEST: ${highScore}M)`; 
         startBtn.innerText = "INITIALIZE REBOOT";
     }, 1000);
 }

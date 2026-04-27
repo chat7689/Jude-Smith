@@ -65,10 +65,13 @@ let W, H;
 let frame = 0;
 let state = 'START'; 
 
-// The three biomes without Gravity Flux
+// Six unique biomes
 const BIOMES = [
     { name: "NEON GATES", color: '#00e5ff', type: 'gap' },
+    { name: "SINE TUNNEL", color: '#ff00aa', type: 'sine' },
     { name: "ORBITAL CLUSTER", color: '#00ff66', type: 'circle' },
+    { name: "HEXAGON HIVE", color: '#ffff00', type: 'hex' },
+    { name: "PULSE PILLARS", color: '#ff0000', type: 'pulse' },
     { name: "GEOMETRIC TRENCH", color: '#ffaa00', type: 'triangle' }
 ];
 
@@ -130,10 +133,16 @@ const player = {
     },
     
     update() {
-        const force = 0.85; 
-        this.vy += this.pressing ? -force : force; // Standard gravity
+        // Control multiplier matches speed scaling (base speed is 9)
+        const controlRatio = game.speed / 9; 
         
-        if (this.vy > 14) this.vy = 14; if (this.vy < -14) this.vy = -14;
+        const force = 0.85 * controlRatio; 
+        this.vy += this.pressing ? -force : force; 
+        
+        const maxVy = 14 * controlRatio;
+        if (this.vy > maxVy) this.vy = maxVy; 
+        if (this.vy < -maxVy) this.vy = -maxVy;
+        
         this.y += this.vy;
 
         this.trail.push({ x: this.x, y: this.y });
@@ -145,7 +154,6 @@ const player = {
     },
     
     draw() {
-        // Player always matches the currently visible UI biome
         const pCol = BIOMES[game.uiBiomeIdx].color;
 
         if (this.trail.length > 1) {
@@ -175,7 +183,7 @@ function spawnObstacles() {
         const biome = BIOMES[game.spawnBiomeIdx];
         const gapY = 180 + Math.random() * (H - 360); 
         const x = game.nextSpawnX;
-        
+        let spacing = 650; // Default spacing
         let startLen = obstacles.length; 
 
         if (biome.type === 'gap') {
@@ -183,12 +191,30 @@ function spawnObstacles() {
             obstacles.push({ type: 'rect', x: x, y: 0, w: 70, h: gapY - (gapSize/2) }); 
             obstacles.push({ type: 'rect', x: x, y: gapY + (gapSize/2), w: 70, h: H }); 
         } 
+        else if (biome.type === 'sine') {
+            // Gap center strictly follows a sine wave calculated by its X position
+            const sineY = H/2 + Math.sin(x * 0.003) * (H * 0.35);
+            const gapSize = 330; 
+            obstacles.push({ type: 'rect', x: x, y: 0, w: 70, h: sineY - (gapSize/2) }); 
+            obstacles.push({ type: 'rect', x: x, y: sineY + (gapSize/2), w: 70, h: H }); 
+            spacing = 300; // Pack them tighter to form a visible wave tunnel
+        }
+        else if (biome.type === 'pulse') {
+            // Dynamic pulsating rectangles
+            obstacles.push({ type: 'pulse', x: x, gapY: gapY, gapSize: 350, phase: x * 0.01 }); 
+        }
         else if (biome.type === 'circle') {
             const bigRadius = 55 + Math.random() * 45;
             obstacles.push({ type: 'circle', x: x, y: gapY, r: bigRadius, bobY: gapY, bobSpd: 0.04 });
-            
             if (Math.random() > 0.4) {
                 obstacles.push({ type: 'circle', x: x + 160, y: gapY + (Math.random()*300-150), r: 40, bobY: gapY, bobSpd: 0.02 });
+            }
+        }
+        else if (biome.type === 'hex') {
+            const hexSpin = (Math.random() > 0.5 ? 1 : -1) * 0.05;
+            obstacles.push({ type: 'hex', x: x, y: gapY, r: 80, angle: Math.random() * Math.PI, spin: hexSpin });
+            if (Math.random() > 0.4) {
+                obstacles.push({ type: 'hex', x: x + 200, y: gapY + (Math.random()*200-100), r: 55, angle: Math.random() * Math.PI, spin: hexSpin * 1.5 });
             }
         }
         else if (biome.type === 'triangle') {
@@ -199,12 +225,11 @@ function spawnObstacles() {
             }
         }
 
-        // Tag the obstacles with their spawned biome index
         for(let i = startLen; i < obstacles.length; i++) {
             obstacles[i].biomeIdx = game.spawnBiomeIdx;
         }
 
-        game.nextSpawnX += 650; // Fixed spacing
+        game.nextSpawnX += spacing; 
     }
 }
 
@@ -213,7 +238,6 @@ function updateAndDrawObstacles() {
         let o = obstacles[i];
         o.x -= game.speed;
 
-        // INVISIBLE SYNC MARKER: Triggers when the new biome actually enters the screen
         if (o.type === 'transition') {
             if (o.x < W * 0.6) { 
                 game.uiBiomeIdx = o.biomeIdx;
@@ -234,10 +258,37 @@ function updateAndDrawObstacles() {
             if (player.x + player.size > o.x && player.x - player.size < o.x + o.w &&
                 player.y + player.size > o.y && player.y - player.size < o.y + o.h) { die(); }
         } 
+        else if (o.type === 'pulse') {
+            // Gap dynamically shrinks and expands
+            let currentGap = o.gapSize + Math.sin(frame * 0.06 + o.phase) * 160;
+            // Prevent gap from closing entirely to keep it strictly fair
+            if (currentGap < 120) currentGap = 120; 
+            
+            let topH = o.gapY - (currentGap/2);
+            let botY = o.gapY + (currentGap/2);
+            
+            ctx.fillRect(o.x, 0, 70, topH); ctx.strokeRect(o.x, 0, 70, topH);
+            ctx.fillRect(o.x, botY, 70, H - botY); ctx.strokeRect(o.x, botY, 70, H - botY);
+            
+            if (player.x + player.size > o.x && player.x - player.size < o.x + 70) {
+                if (player.y - player.size < topH || player.y + player.size > botY) die();
+            }
+        }
         else if (o.type === 'circle') {
             if (o.bobSpd > 0) o.y = o.bobY + Math.sin(frame * o.bobSpd) * 80; 
             ctx.beginPath(); ctx.arc(o.x, o.y, o.r, 0, Math.PI*2); ctx.fill(); ctx.stroke();
             if (Math.hypot(player.x - o.x, player.y - o.y) < o.r + player.size) die();
+        }
+        else if (o.type === 'hex') {
+            o.angle += o.spin;
+            ctx.beginPath();
+            for (let j = 0; j < 6; j++) {
+                const a = (Math.PI * 2 / 6) * j + o.angle;
+                ctx[j === 0 ? 'moveTo' : 'lineTo'](o.x + o.r * Math.cos(a), o.y + o.r * Math.sin(a));
+            }
+            ctx.closePath(); ctx.fill(); ctx.stroke();
+            // Approximating hex collision circle slightly smaller than visual radius
+            if (Math.hypot(player.x - o.x, player.y - o.y) < o.r * 0.85 + player.size) die();
         }
         else if (o.type === 'tri') {
             o.angle += o.spin;
@@ -306,20 +357,18 @@ function loop() {
         frame++;
         
         if (state === 'PLAY') {
-            game.speed = 9 + (game.distance / 600); // Speed scales up!
+            game.speed = 9 + (game.distance / 600); // Speed continually scales up
             game.distance += game.speed / 10;
             game.nextSpawnX -= game.speed; 
             
             distDisplay.innerText = Math.floor(game.distance) + "M";
             
-            // SPAWNER UPDATE - Triggers exactly every 1000m
             if (game.distance >= game.nextBiomeDist) {
                 game.spawnBiomeIdx = (game.spawnBiomeIdx + 1) % BIOMES.length;
-                game.nextBiomeDist += 1000; 
+                game.nextBiomeDist += 1000; // Trigger exactly every 1000m
                 
-                game.nextSpawnX += W * 0.8; // Creates a safe buffer zone between biomes
+                game.nextSpawnX += W * 0.8; 
                 
-                // Drop the invisible UI sync marker
                 obstacles.push({ type: 'transition', x: game.nextSpawnX - 150, biomeIdx: game.spawnBiomeIdx });
             }
 

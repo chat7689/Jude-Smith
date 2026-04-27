@@ -66,7 +66,6 @@ const highDisplay = document.getElementById('high-display');
 const biomeDisplay = document.getElementById('biome-display');
 const biomeBox = document.getElementById('biome-box');
 
-// Load High Score
 let highScore = localStorage.getItem('gus_highscore') || 0;
 highDisplay.innerText = highScore + "M";
 
@@ -74,17 +73,18 @@ let W, H;
 let frame = 0;
 let state = 'START'; 
 
-// Updated Biomes (Sine Tunnel is now just TUNNEL)
+// Seven unique biomes
 const BIOMES = [
     { name: "NEON GATES", color: '#00e5ff', type: 'gap' },
     { name: "TUNNEL", color: '#ff00aa', type: 'sine' },
+    { name: "CAVE DIVERS CAVE", color: '#bb00ff', type: 'cave' },
     { name: "ORBITAL CLUSTER", color: '#00ff66', type: 'circle' },
     { name: "HEXAGON HIVE", color: '#ffff00', type: 'hex' },
     { name: "PULSE PILLARS", color: '#ff0000', type: 'pulse' },
     { name: "GEOMETRIC TRENCH", color: '#ffaa00', type: 'triangle' }
 ];
 
-let game = { speed: 8, distance: 0, spawnBiomeIdx: 0, uiBiomeIdx: 0, nextSpawnX: 0, screenShake: 0, nextBiomeDist: 1000 };
+let game = { speed: 8, distance: 0, spawnBiomeIdx: 0, uiBiomeIdx: 0, nextSpawnX: 0, screenShake: 0, nextBiomeDist: 1000, biomeSpawnCount: 0 };
 
 // --- STARS ---
 const stars = [];
@@ -142,10 +142,9 @@ const player = {
     },
     
     update() {
-        // Control multiplier matches speed scaling so the flight angle is consistent
         const controlRatio = game.speed / 9; 
-        
         const force = 0.85 * controlRatio; 
+        
         this.vy += this.pressing ? -force : force; 
         
         const maxVy = 14 * controlRatio;
@@ -189,10 +188,12 @@ let obstacles = [];
 
 function spawnObstacles() {
     while (game.nextSpawnX < W + 800) {
+        game.biomeSpawnCount++; // Tracks how many objects have spawned in the current biome
+        
         const biome = BIOMES[game.spawnBiomeIdx];
         const gapY = 180 + Math.random() * (H - 360); 
         const x = game.nextSpawnX;
-        let spacing = 650; // Default spacing
+        let spacing = 650; 
         let startLen = obstacles.length; 
 
         if (biome.type === 'gap') {
@@ -201,12 +202,23 @@ function spawnObstacles() {
             obstacles.push({ type: 'rect', x: x, y: gapY + (gapSize/2), w: 70, h: H }); 
         } 
         else if (biome.type === 'sine') {
-            // Tightened spacing and adjusted frequency for a perfect sine wave path
-            const sineY = H/2 + Math.sin(x * 0.005) * (H * 0.35);
+            // FIXED: Uses the internal spawn count so it forms a guaranteed wave pattern
+            const sineY = H/2 + Math.sin(game.biomeSpawnCount * 0.4) * (H * 0.35);
             const gapSize = 330; 
             obstacles.push({ type: 'rect', x: x, y: 0, w: 70, h: sineY - (gapSize/2) }); 
             obstacles.push({ type: 'rect', x: x, y: sineY + (gapSize/2), w: 70, h: H }); 
-            spacing = 150; // Pillars packed closely together to create the "tunnel" effect
+            spacing = 150; 
+        }
+        else if (biome.type === 'cave') {
+            spacing = 150;
+            // A 1000m sector = 10,000 pixels. 10000 / 150 spacing = ~66 spawns per sector.
+            let progress = Math.min(game.biomeSpawnCount / 66, 1.0); 
+            
+            let startGap = H * 0.8;
+            let endGap = H / 8;
+            let currentGap = startGap - ((startGap - endGap) * progress);
+            
+            obstacles.push({ type: 'spike', x: x, w: 80, topY: H/2 - currentGap/2, botY: H/2 + currentGap/2 });
         }
         else if (biome.type === 'pulse') {
             obstacles.push({ type: 'pulse', x: x, gapY: gapY, gapSize: 350, phase: x * 0.01 }); 
@@ -266,6 +278,22 @@ function updateAndDrawObstacles() {
             if (player.x + player.size > o.x && player.x - player.size < o.x + o.w &&
                 player.y + player.size > o.y && player.y - player.size < o.y + o.h) { die(); }
         } 
+        else if (o.type === 'spike') {
+            // Draw Top Spike
+            ctx.beginPath();
+            ctx.moveTo(o.x, 0); ctx.lineTo(o.x + o.w, 0); ctx.lineTo(o.x + o.w / 2, o.topY);
+            ctx.closePath(); ctx.fill(); ctx.stroke();
+            
+            // Draw Bottom Spike
+            ctx.beginPath();
+            ctx.moveTo(o.x, H); ctx.lineTo(o.x + o.w, H); ctx.lineTo(o.x + o.w / 2, o.botY);
+            ctx.closePath(); ctx.fill(); ctx.stroke();
+            
+            // Forgiving hitbox (narrower than the visual triangle base)
+            if (player.x + player.size > o.x + 15 && player.x - player.size < o.x + o.w - 15) {
+                if (player.y - player.size < o.topY - 10 || player.y + player.size > o.botY + 10) die();
+            }
+        }
         else if (o.type === 'pulse') {
             let currentGap = o.gapSize + Math.sin(frame * 0.06 + o.phase) * 160;
             if (currentGap < 120) currentGap = 120; 
@@ -315,7 +343,7 @@ window.addEventListener('resize', resize);
 function initGame() {
     state = 'PLAY'; screens.style.display = 'none';
     game.speed = 9; game.distance = 0; 
-    game.spawnBiomeIdx = 0; game.uiBiomeIdx = 0; 
+    game.spawnBiomeIdx = 0; game.uiBiomeIdx = 0; game.biomeSpawnCount = 0;
     game.nextSpawnX = W; game.screenShake = 0; game.nextBiomeDist = 1000; 
     obstacles = []; particles.length = 0; player.reset(); 
     updateBiomeUI();
@@ -326,7 +354,6 @@ function die() {
     state = 'DEAD'; game.screenShake = 20;
     spawnParticles(player.x, player.y, '#ff0055', 150, 25, 'explode');
     
-    // Check and save Highscore
     let finalScore = Math.floor(game.distance);
     if (finalScore > highScore) {
         highScore = finalScore;
@@ -370,7 +397,7 @@ function loop() {
         frame++;
         
         if (state === 'PLAY') {
-            game.speed = 9 + (game.distance / 600); // Speed continually scales up
+            game.speed = 9 + (game.distance / 600); 
             game.distance += game.speed / 10;
             game.nextSpawnX -= game.speed; 
             
@@ -378,10 +405,10 @@ function loop() {
             
             if (game.distance >= game.nextBiomeDist) {
                 game.spawnBiomeIdx = (game.spawnBiomeIdx + 1) % BIOMES.length;
-                game.nextBiomeDist += 1000; // Trigger exactly every 1000m
+                game.nextBiomeDist += 1000; 
+                game.biomeSpawnCount = 0; // Reset internal counter for the new biome
                 
                 game.nextSpawnX += W * 0.8; 
-                
                 obstacles.push({ type: 'transition', x: game.nextSpawnX - 150, biomeIdx: game.spawnBiomeIdx });
             }
 
